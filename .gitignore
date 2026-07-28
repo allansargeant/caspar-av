@@ -1,0 +1,7 @@
+/target
+node_modules/
+console/dist/
+web/
+*.log
+.DS_Store
+show.json

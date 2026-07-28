@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "caspar-avd",
+      "runtimeExecutable": "cargo",
+      "runtimeArgs": ["run", "-p", "showd", "--", "--web", "web", "--show", "show.json"],
+      "port": 8080
+    }
+  ]
+}
