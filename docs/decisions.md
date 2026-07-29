@@ -145,6 +145,16 @@ wrong, and every command and reply goes to the log.
 An action naming an unknown screen aborts the cue. Firing "the parts that
 resolved" puts a half-state on stage and hides the fault.
 
+## Detect a lost connection without writing to it
+
+`is_closed()` originally just asked whether the command channel had closed —
+which only happens after a *failed write*. A server that went away while nobody
+was sending therefore looked alive indefinitely: the supervisor's reconnect loop
+never fired, and the console reported itself connected while serving telemetry
+frozen at the moment the server died. Found by restarting the fake server under
+a running daemon, which is exactly what happens when someone restarts CasparCG
+mid-rig. The reader task sees EOF immediately, so it now sets a shared flag.
+
 ## Still open
 
 - **Auto-follow.** Cues carry a follow time; nothing executes it. Needs a cue

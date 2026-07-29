@@ -20,6 +20,16 @@ function standaloneWindowPage(): PageId | null {
   return (PAGE_IDS as string[]).includes(id ?? "") ? (id as PageId) : null;
 }
 
+/**
+ * The page named by `?page=<id>` — which page to open on, with the shell and
+ * its tabs intact. Distinct from `?window=`, which strips the shell for a
+ * second display. Useful for bookmarking the page you run a show from.
+ */
+function requestedPage(): PageId | null {
+  const id = new URLSearchParams(window.location.search).get("page");
+  return (PAGE_IDS as string[]).includes(id ?? "") ? (id as PageId) : null;
+}
+
 /** URL that opens `page` alone in a new window — the "detach" target. */
 export function popOutUrl(page: PageId): string {
   const url = new URL(window.location.href);
@@ -30,7 +40,7 @@ export function popOutUrl(page: PageId): string {
 export function App() {
   const { snapshot, status, error } = useSnapshot();
   const [standalone] = useState(standaloneWindowPage);
-  const [page, setPage] = useState<PageId>(() => standalone ?? "media");
+  const [page, setPage] = useState<PageId>(() => standalone ?? requestedPage() ?? "media");
   const [dismissed, setDismissed] = useState<string | null>(null);
 
   // The screen most actions target. Held at app level so switching pages does

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as actions from "../lib/actions";
 import type { Action, Cue } from "../lib/types";
 import { CommandLog, Frame, Inspector } from "../shell/Shell";
@@ -19,6 +19,14 @@ export function CuesPage({ snapshot, target, setTarget }: PageProps) {
   const [newName, setNewName] = useState("");
 
   const cue = cues.find((c) => c.id === selectedId) ?? null;
+
+  // Land on the first cue rather than two "select something" panels. Also
+  // recovers the selection when the chosen cue is deleted by another console.
+  useEffect(() => {
+    if (cues.length > 0 && !cues.some((c) => c.id === selectedId)) {
+      setSelectedId(cues[0].id);
+    }
+  }, [cues, selectedId]);
 
   const addCue = () => {
     const name = newName.trim() || `Cue ${cues.length + 1}`;

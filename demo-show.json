@@ -1,0 +1,329 @@
+{
+  "name": "Ballroom — Day 2",
+  "canvas": {
+    "width": 3840,
+    "height": 1080
+  },
+  "screens": [
+    {
+      "id": "left",
+      "name": "Left projector",
+      "channel": 1,
+      "layer": 10,
+      "rect": {
+        "x": 0.0,
+        "y": 0.06,
+        "w": 0.36,
+        "h": 0.88
+      },
+      "corners": [
+        [
+          0.0,
+          0.03
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.0,
+          0.97
+        ]
+      ],
+      "enabled": true,
+      "opacity": 1.0
+    },
+    {
+      "id": "centre",
+      "name": "Centre LED",
+      "channel": 1,
+      "layer": 20,
+      "rect": {
+        "x": 0.335,
+        "y": 0.0,
+        "w": 0.33,
+        "h": 1.0
+      },
+      "corners": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "enabled": true,
+      "opacity": 1.0
+    },
+    {
+      "id": "right",
+      "name": "Right projector",
+      "channel": 2,
+      "layer": 10,
+      "rect": {
+        "x": 0.64,
+        "y": 0.06,
+        "w": 0.36,
+        "h": 0.88
+      },
+      "corners": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.03
+        ],
+        [
+          1.0,
+          0.97
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "enabled": true,
+      "opacity": 1.0
+    },
+    {
+      "id": "lobby",
+      "name": "Lobby screen",
+      "channel": 2,
+      "layer": 30,
+      "rect": {
+        "x": 0.04,
+        "y": 0.66,
+        "w": 0.16,
+        "h": 0.28
+      },
+      "corners": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "enabled": false,
+      "opacity": 0.85
+    }
+  ],
+  "cues": [
+    {
+      "id": "walk-in",
+      "name": "Walk-in loop",
+      "actions": [
+        {
+          "type": "play",
+          "screen": "left",
+          "clip": "WALK_IN/LOGO_LOOP",
+          "looping": true,
+          "transition": {
+            "kind": "mix",
+            "frames": 25,
+            "tween": null,
+            "direction": null,
+            "sting": null
+          }
+        },
+        {
+          "type": "play",
+          "screen": "centre",
+          "clip": "LOOPS/AMBIENT_BLUE",
+          "looping": true,
+          "transition": null
+        },
+        {
+          "type": "play",
+          "screen": "right",
+          "clip": "WALK_IN/LOGO_LOOP",
+          "looping": true,
+          "transition": null
+        }
+      ],
+      "follow": null,
+      "colour": null
+    },
+    {
+      "id": "opener",
+      "name": "Opener VT",
+      "actions": [
+        {
+          "type": "play",
+          "screen": "centre",
+          "clip": "OPENER",
+          "looping": false,
+          "transition": {
+            "kind": "mix",
+            "frames": 12,
+            "tween": "easeinoutsine",
+            "direction": null,
+            "sting": null
+          }
+        },
+        {
+          "type": "opacity",
+          "screen": "left",
+          "value": 0.0,
+          "frames": 12,
+          "tween": null
+        },
+        {
+          "type": "opacity",
+          "screen": "right",
+          "value": 0.0,
+          "frames": 12,
+          "tween": null
+        }
+      ],
+      "follow": 24.0,
+      "colour": null
+    },
+    {
+      "id": "keynote",
+      "name": "Keynote — slides",
+      "actions": [
+        {
+          "type": "play",
+          "screen": "centre",
+          "clip": "KEYNOTE/SLIDE_BG",
+          "looping": true,
+          "transition": null
+        },
+        {
+          "type": "opacity",
+          "screen": "left",
+          "value": 1.0,
+          "frames": 25,
+          "tween": null
+        },
+        {
+          "type": "opacity",
+          "screen": "right",
+          "value": 1.0,
+          "frames": 25,
+          "tween": null
+        },
+        {
+          "type": "template",
+          "screen": "centre",
+          "template": "LOWER_THIRDS/NAME",
+          "cg_layer": 1,
+          "data": "{\"f0\":\"Dr Amara Osei\",\"f1\":\"Chief Scientist\"}"
+        }
+      ],
+      "follow": null,
+      "colour": null
+    },
+    {
+      "id": "break",
+      "name": "Break — countdown",
+      "actions": [
+        {
+          "type": "play",
+          "screen": "centre",
+          "clip": "BREAK/COUNTDOWN_5MIN",
+          "looping": false,
+          "transition": null
+        },
+        {
+          "type": "play",
+          "screen": "left",
+          "clip": "HOLDING/SPONSORS",
+          "looping": false,
+          "transition": null
+        },
+        {
+          "type": "play",
+          "screen": "right",
+          "clip": "HOLDING/SPONSORS",
+          "looping": false,
+          "transition": null
+        }
+      ],
+      "follow": null,
+      "colour": null
+    },
+    {
+      "id": "blackout",
+      "name": "Blackout",
+      "actions": [
+        {
+          "type": "opacity",
+          "screen": "left",
+          "value": 0.0,
+          "frames": 25,
+          "tween": null
+        },
+        {
+          "type": "opacity",
+          "screen": "centre",
+          "value": 0.0,
+          "frames": 25,
+          "tween": null
+        },
+        {
+          "type": "opacity",
+          "screen": "right",
+          "value": 0.0,
+          "frames": 25,
+          "tween": null
+        }
+      ],
+      "follow": null,
+      "colour": null
+    }
+  ],
+  "pads": [
+    {
+      "index": 0,
+      "cue": "walk-in"
+    },
+    {
+      "index": 1,
+      "cue": "opener"
+    },
+    {
+      "index": 2,
+      "cue": "keynote"
+    },
+    {
+      "index": 4,
+      "cue": "break"
+    },
+    {
+      "index": 7,
+      "cue": "blackout"
+    }
+  ],
+  "grid": [
+    8,
+    3
+  ]
+}

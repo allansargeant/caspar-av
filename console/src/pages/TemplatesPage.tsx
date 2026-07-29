@@ -30,6 +30,14 @@ export function TemplatesPage(props: PageProps) {
     setRawJson("{}");
   }, [selectedId]);
 
+  // Open on the first template, so the page shows a form rather than a prompt.
+  useEffect(() => {
+    const list = snapshot.templates;
+    if (list.length > 0 && !list.some((t) => t.id === selectedId)) {
+      setSelectedId(list[0].id);
+    }
+  }, [snapshot.templates, selectedId]);
+
   const data = properties
     ? JSON.stringify(Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== "")))
     : rawJson;

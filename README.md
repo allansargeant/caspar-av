@@ -14,6 +14,12 @@ trigger grid, in a browser.
 
 Not affiliated with or endorsed by the CasparCG project.
 
+![Output mapping on the Screens page](docs/assets/screens.png)
+
+> Four outputs placed on a 3840×1080 show canvas. Dragging a screen writes
+> `MIXER FILL`; the corner-pin numbers write `MIXER PERSPECTIVE`. Every command
+> sent is in the log along the bottom.
+
 ## Why this exists
 
 [CasparCG Server](https://github.com/CasparCG/server) is a superb playout engine
@@ -91,8 +97,9 @@ cd console && npm ci && npm run build && cd ..
 
 Then open <http://localhost:8080>.
 
-No CasparCG to hand? Run the fake one — it speaks real AMCP framing, real
-`REQ`/`RES` correlation and pushes real OSC telemetry:
+No CasparCG to hand? Run the fake one. It speaks real AMCP framing, real
+`REQ`/`RES` correlation and pushes real OSC telemetry — and stands in for
+media-scanner too, so the Media and Templates pages have something to show:
 
 ```bash
 python3 scripts/fake-caspar.py
@@ -106,14 +113,58 @@ python3 scripts/protocol-probe.py --host <your-caspar-host>
 
 ## The pages
 
-| Page | What it does |
-|---|---|
-| **Media** | Library from media-scanner, with thumbnails. Click to inspect, double-click to play onto the target screen. |
-| **Screens** | Output mapping. Drag a screen on the canvas to write `MIXER FILL`; corner-pin numerics write `MIXER PERSPECTIVE`. |
-| **Channels** | Live state from OSC — position, duration, fps, server frame time — with a raw AMCP command line. |
-| **Cues** | Build cues from actions; fired as one `BEGIN`/`COMMIT` batch so every screen changes together. |
-| **Templates** | Templates from media-scanner. Where a template publishes a GDD schema, the data form is generated from it. |
-| **Grid** | Cues as trigger pads. Number keys 1–9 and 0 fire the first ten. |
+Six pages on one shared frame, with the command log always along the bottom —
+because "did that command actually land?" is the question a show asks most.
+
+<table>
+<tr>
+<td width="50%">
+
+**Media** — the library from media-scanner, with thumbnails. Double-click to
+play onto the target screen.
+
+<img src="docs/assets/media.png" alt="Media page">
+</td>
+<td width="50%">
+
+**Channels** — live state straight from OSC: what is playing, position and
+duration, plus a raw AMCP command line for when something is wrong.
+
+<img src="docs/assets/channels.png" alt="Channels page">
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**Cues** — several screens changed together. Fired as one `BEGIN`/`COMMIT`
+batch, so every screen changes on the same frame.
+
+<img src="docs/assets/cues.png" alt="Cues page">
+</td>
+<td width="50%">
+
+**Templates** — where a template publishes a **GDD** schema, the data form is
+generated from it rather than typed as JSON.
+
+<img src="docs/assets/templates.png" alt="Templates page">
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**Grid** — cues as trigger pads. Number keys 1–9 and 0 fire the first ten.
+
+<img src="docs/assets/grid.png" alt="Grid page">
+</td>
+<td width="50%">
+
+**Screens** — output mapping, shown at the top of this page.
+
+Every screenshot here is a real render against
+`scripts/fake-caspar.py`, captured by `scripts/screenshots.py`.
+</td>
+</tr>
+</table>
 
 ## Documentation
 

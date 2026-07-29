@@ -188,6 +188,65 @@ async fn losing_the_connection_wakes_waiters() {
 }
 
 #[tokio::test]
+async fn a_vanished_server_is_noticed_without_sending_anything() {
+    // The failure this guards against: a supervisor watching is_closed() to
+    // decide when to reconnect. If the flag only flips after a failed write,
+    // a server that restarts overnight is never noticed — the bridge reports
+    // itself connected, serves telemetry frozen at the moment the server died,
+    // and only fails when an operator finally fires a cue.
+    let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr = listener.local_addr().unwrap();
+    tokio::spawn(async move {
+        let (socket, _) = listener.accept().await.unwrap();
+        // Hold it open briefly, then hang up. Nothing is ever sent either way.
+        tokio::time::sleep(Duration::from_millis(100)).await;
+        drop(socket);
+    });
+
+    let client = Client::connect(addr).await.unwrap();
+    assert!(!client.is_closed(), "should start out open");
+
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(5);
+    while !client.is_closed() && tokio::time::Instant::now() < deadline {
+        tokio::time::sleep(Duration::from_millis(25)).await;
+    }
+    assert!(client.is_closed(), "the drop must be visible without a write");
+}
+
+#[tokio::test]
+async fn commands_on_a_dead_connection_fail_immediately() {
+    let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr = listener.local_addr().unwrap();
+    tokio::spawn(async move {
+        let (socket, _) = listener.accept().await.unwrap();
+        drop(socket);
+    });
+
+    let client = Client::connect(addr).await.unwrap();
+    while !client.is_closed() {
+        tokio::time::sleep(Duration::from_millis(25)).await;
+    }
+
+    // Well inside the 30s reply timeout: the point is that it does not wait.
+    let started = tokio::time::Instant::now();
+    let err = tokio::time::timeout(Duration::from_secs(2), client.send(commands::play(1, 10)))
+        .await
+        .expect("must not wait out the reply timeout")
+        .unwrap_err();
+    assert!(matches!(err, amcp::Error::Disconnected), "got {err:?}");
+    assert!(started.elapsed() < Duration::from_secs(1));
+
+    let err = tokio::time::timeout(
+        Duration::from_secs(2),
+        client.batch(vec![commands::play(1, 10), commands::play(2, 10)]),
+    )
+    .await
+    .expect("batch must not wait either")
+    .unwrap_err();
+    assert!(matches!(err, amcp::Error::Disconnected), "got {err:?}");
+}
+
+#[tokio::test]
 async fn commands_are_written_in_order_from_concurrent_callers() {
     let (client, mut seen) = fake_server(|line, out| {
         out.push(format!("RES {} 202 OK\r\n", req_id(line)));

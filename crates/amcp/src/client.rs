@@ -7,7 +7,7 @@
 //! them.
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
@@ -68,6 +68,13 @@ pub struct Client {
     notifications: broadcast::Sender<Response>,
     next_id: Arc<AtomicU64>,
     pending: Pending,
+    /// Set as soon as either half of the connection ends.
+    ///
+    /// Not derivable from the command channel: that only closes once a *write*
+    /// has failed, so a server that goes away while nobody is sending looks
+    /// alive indefinitely — and a supervisor watching for the drop never
+    /// reconnects. The reader notices EOF immediately, so it is what sets this.
+    closed: Arc<AtomicBool>,
 }
 
 impl Client {
@@ -87,17 +94,20 @@ impl Client {
         let (tx, mut rx) = mpsc::unbounded_channel::<Outgoing>();
         let (notifications, _) = broadcast::channel(256);
         let pending: Pending = Arc::new(Mutex::new(HashMap::new()));
+        let closed = Arc::new(AtomicBool::new(false));
 
         // Writer: serialise commands, registering the reply slot *before* the
         // bytes go out so a fast reply can never arrive before its slot exists.
         {
             let pending = pending.clone();
+            let closed = closed.clone();
             tokio::spawn(async move {
                 while let Some(out) = rx.recv().await {
                     if let Some((id, slot)) = out.slot {
                         lock(&pending).insert(id, slot);
                     }
                     if writer.write_all(out.wire.as_bytes()).await.is_err() {
+                        closed.store(true, Ordering::Relaxed);
                         break;
                     }
                 }
@@ -110,6 +120,7 @@ impl Client {
         {
             let pending = pending.clone();
             let notifications = notifications.clone();
+            let closed = closed.clone();
             tokio::spawn(async move {
                 let mut decoder = Decoder::new();
                 let mut buf = vec![0u8; 16 * 1024];
@@ -135,13 +146,15 @@ impl Client {
                         }
                     }
                 }
-                // Connection closed: drop every slot so waiters see
+                // Connection closed: mark it so a supervisor notices without
+                // having to send anything, and drop every slot so waiters see
                 // `Disconnected` instead of hanging until the timeout.
+                closed.store(true, Ordering::Relaxed);
                 lock(&pending).clear();
             });
         }
 
-        Self { tx, notifications, next_id: Arc::new(AtomicU64::new(1)), pending }
+        Self { tx, notifications, next_id: Arc::new(AtomicU64::new(1)), pending, closed }
     }
 
     fn next_id(&self) -> String {
@@ -172,6 +185,10 @@ impl Client {
         // *before* sending is what stops the reply racing past the subscriber.
         if command.name().eq_ignore_ascii_case("PING") {
             return self.ping(command).await;
+        }
+
+        if self.is_closed() {
+            return Err(Error::Disconnected);
         }
 
         let id = self.next_id();
@@ -214,6 +231,9 @@ impl Client {
         // server shortcuts it anyway.
         if commands.len() == 1 {
             return self.send(commands.into_iter().next().unwrap()).await;
+        }
+        if self.is_closed() {
+            return Err(Error::Disconnected);
         }
 
         let id = self.next_id();
@@ -276,8 +296,8 @@ impl Client {
         self.notifications.subscribe()
     }
 
-    /// True once the connection has gone away.
+    /// True once the connection has gone away, in either direction.
     pub fn is_closed(&self) -> bool {
-        self.tx.is_closed()
+        self.closed.load(Ordering::Relaxed) || self.tx.is_closed()
     }
 }

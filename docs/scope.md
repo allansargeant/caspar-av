@@ -120,6 +120,10 @@ cells, and `MIXER PERSPECTIVE` produces a genuine corner-pin wedge (left edge
 - **`Health::Down` appears only after a connection attempt completes**, so there
   is a brief honest "connecting" window at startup.
 - **The command log holds 300 entries** in memory and is not persisted.
+- **Telemetry freezes rather than clears when the server goes away.** Keys expire
+  by packet count, and no packets arrive, so the Channels page keeps showing the
+  last known positions. The header turns red and reads "CasparCG offline", but
+  the frozen figures could still be misread at a glance.
 - **The HTML/CEF producer was never exercised.** The test rig has no GPU, so
   CEF's GPU process dies on start. Templates were verified as AMCP command
   round-trips, not as rendered graphics.
