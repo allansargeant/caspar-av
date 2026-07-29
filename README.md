@@ -27,8 +27,8 @@ with an odd gap around it: the organisation's own `Frontend` is archived, and th
 maintained client is a Qt desktop app. There is no maintained web front end.
 
 More to the point, CasparCG is presented as a *broadcast playout* engine, while
-the pieces needed to use it as a *live-events media server* — the thing Pixera,
-disguise, Millumin and Resolume sell — are already in it and simply unexposed:
+the pieces needed to drive it as a *live-events media server* are already in it
+and simply unexposed:
 
 | What a media server needs | What CasparCG already has |
 |---|---|
@@ -74,8 +74,8 @@ Built, tested, and **verified against a real CasparCG 2.5.0 server**.
 - **`showd`** (`caspar-avd`) — the bridge: supervised connection with reconnect,
   telemetry subscription, show model and cue compiler, REST + WebSocket API,
   serves the console. 12 tests.
-- **console** — six pages on a shared Resolve-style frame, ported from
-  [OpenStage](https://github.com/allansargeant/openstage)'s console.
+- **console** — six pages on one shared frame, ported from
+  [OpenStage](https://github.com/stoatworks-labs/openstage)'s console.
 
 **Verified against real CasparCG 2.5.0** — `scripts/protocol-probe.py` checks 22
 protocol claims with raw sockets (sharing no code with the crates, so it can
@@ -176,6 +176,25 @@ Every screenshot here is a real render against
 | [scope.md](docs/scope.md) | Honestly what is built, what is partial, what is not started |
 | [releasing.md](docs/releasing.md) | How the six-platform release is built, locally |
 | [test-server.md](docs/test-server.md) | Running a real CasparCG to test against, on a Mac |
+
+## Inspired by
+
+caspar-AV is not a clone of any of these, and is not affiliated with them. They
+are listed because the ideas are theirs, and pretending otherwise would be
+dishonest.
+
+- **Pixera, disguise, Millumin and Resolume** — the show model. Screens placed
+  on a canvas, corner-pin per output, and a cue that changes several screens on
+  one frame are all conventions these established. What caspar-AV does is show
+  that CasparCG already has the primitives to work that way.
+- **DaVinci Resolve** — the shape of the console: a bottom page-tab bar, and
+  every page built from the same toolbar / left / centre / right / bottom frame
+  with a context inspector on the right.
+- **[OpenStage](https://github.com/stoatworks-labs/openstage)** — the console
+  shell itself, the snapshot-mirror architecture, and the WebSocket-with-polling
+  connection layer, all ported directly from its own console.
+- **[CasparCG](https://github.com/CasparCG/server)** — the engine that does all
+  the actual work here.
 
 ## Licence
 

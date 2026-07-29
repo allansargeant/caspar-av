@@ -138,12 +138,12 @@ someone drags a screen; a show file is not worth an fsync per frame.
 
 ## The console
 
-Ported from [OpenStage](https://github.com/allansargeant/openstage)'s console —
+Ported from [OpenStage](https://github.com/stoatworks-labs/openstage)'s console —
 the shell, the connection layer with its polling fallback, the inspector idiom,
 the `?window=<page>` pop-out for a second display, and the palette.
 
-The page model is Resolve's: a bottom page-tab bar, and every page built from one
-five-region `Frame` (toolbar / left / centre / right / bottom). The bottom dock
+The page model: a bottom page-tab bar, and every page built from one five-region
+`Frame` (toolbar / left / centre / right / bottom). The bottom dock
 is the command log on every page — what was sent, what came back — because on a
 show, "did that command actually land?" is the question that gets asked.
 

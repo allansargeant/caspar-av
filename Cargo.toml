@@ -12,7 +12,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 authors = ["Allan Sargeant"]
-repository = "https://github.com/allansargeant/caspar-av"
+repository = "https://github.com/stoatworks-labs/caspar-av"
 
 [workspace.dependencies]
 tokio = { version = "1", features = ["full"] }

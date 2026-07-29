@@ -1,8 +1,8 @@
 /* caspar-AV console.
-   The page shell, palette and frame are ported from the OpenStage console —
-   a Resolve-style dense pro-tool layout with a bottom page-tab bar. The dark
-   palette is kept deliberately: it reads well in a darkened show position, and
-   the two tools sit side by side on the same rig. */
+   The page shell, palette and frame are ported from the OpenStage console — a
+   dense pro-tool layout with a bottom page-tab bar. The dark palette is kept
+   deliberately: it reads well in a darkened show position, and the two tools
+   sit side by side on the same rig. */
 :root {
   --bg: #0c0e13;
   --panel: #151922;
@@ -76,7 +76,7 @@ body {
 .banner.error { background: #2a1618; color: var(--red); }
 .banner-close { margin-left: auto; border: none; background: none; color: inherit; cursor: pointer; }
 
-/* ---- Page tabs (bottom, Resolve-style) ---- */
+/* ---- Page tabs (bottom) ---- */
 .pagetabs {
   display: flex; justify-content: center; gap: 4px;
   height: 46px; flex: none;

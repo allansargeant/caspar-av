@@ -160,7 +160,7 @@ mid-rig. The reader task sees EOF immediately, so it now sets a shared flag.
 - **Auto-follow.** Cues carry a follow time; nothing executes it. Needs a cue
   stack with a running position — a real feature, not a loose end to tie off.
 - **Timeline.** Cue-based only so far. A timecode-locked timeline is the obvious
-  next axis and is how disguise/Pixera are actually driven.
+  next axis, and is how a large show is usually driven.
 - **Multi-server.** One server per daemon. A large rig is several Caspar boxes,
   which needs the screen model to carry a server reference and the cue compiler
   to fan out — and then the frame-accuracy claim needs re-examining, since

@@ -19,7 +19,7 @@ export const PAGES: PageDef[] = [
   { id: "grid", label: "Grid", icon: "⊞" },
 ];
 
-/** The shared Resolve-style frame: top toolbar, left/centre/right, bottom. */
+/** The shared page frame: top toolbar, left/centre/right, bottom. */
 export function Frame(props: {
   toolbar?: ReactNode;
   left?: ReactNode;
