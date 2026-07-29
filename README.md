@@ -123,6 +123,7 @@ python3 scripts/protocol-probe.py --host <your-caspar-host>
 | [architecture.md](docs/architecture.md) | Components, the snapshot contract, the show model and how cues compile |
 | [decisions.md](docs/decisions.md) | Every significant choice, why it won, and what is still open |
 | [scope.md](docs/scope.md) | Honestly what is built, what is partial, what is not started |
+| [releasing.md](docs/releasing.md) | How the six-platform release is built, locally |
 
 ## Licence
 
