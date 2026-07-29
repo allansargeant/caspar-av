@@ -124,6 +124,7 @@ python3 scripts/protocol-probe.py --host <your-caspar-host>
 | [decisions.md](docs/decisions.md) | Every significant choice, why it won, and what is still open |
 | [scope.md](docs/scope.md) | Honestly what is built, what is partial, what is not started |
 | [releasing.md](docs/releasing.md) | How the six-platform release is built, locally |
+| [test-server.md](docs/test-server.md) | Running a real CasparCG to test against, on a Mac |
 
 ## Licence
 
