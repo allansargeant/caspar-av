@@ -623,14 +623,14 @@ mod tests {
 
     #[test]
     fn instant_anim_adds_nothing() {
-        assert_eq!(wire(mixer_opacity(1, 10, 0.5, &Anim::instant())), "MIXER OPACITY 1-10 0.5");
+        assert_eq!(wire(mixer_opacity(1, 10, 0.5, &Anim::instant())), "MIXER 1-10 OPACITY 0.5");
     }
 
     #[test]
     fn eased_anim_appends_duration_then_tween() {
         assert_eq!(
             wire(mixer_opacity(1, 10, 0.5, &Anim::eased(25, "easeoutquad"))),
-            "MIXER OPACITY 1-10 0.5 25 easeoutquad"
+            "MIXER 1-10 OPACITY 0.5 25 easeoutquad"
         );
     }
 
@@ -638,12 +638,12 @@ mod tests {
     fn fill_and_perspective_carry_their_geometry() {
         assert_eq!(
             wire(mixer_fill(1, 10, 0.0, 0.0, 0.5, 0.5, &Anim::instant())),
-            "MIXER FILL 1-10 0 0 0.5 0.5"
+            "MIXER 1-10 FILL 0 0 0.5 0.5"
         );
         let corners = [(0.0, 0.0), (1.0, 0.05), (1.0, 1.0), (0.0, 0.95)];
         assert_eq!(
             wire(mixer_perspective(1, 10, &corners, &Anim::instant())),
-            "MIXER PERSPECTIVE 1-10 0 0 1 0.05 1 1 0 0.95"
+            "MIXER 1-10 PERSPECTIVE 0 0 1 0.05 1 1 0 0.95"
         );
     }
 
@@ -651,7 +651,7 @@ mod tests {
     fn cg_add_encodes_play_on_load_as_a_flag() {
         assert_eq!(
             wire(cg_add(1, 20, 1, "lower-third", true, Some(r#"{"f0":"Hello"}"#))),
-            r#"CG ADD 1-20 1 lower-third 1 "{\"f0\":\"Hello\"}""#
+            r#"CG 1-20 ADD 1 lower-third 1 "{\"f0\":\"Hello\"}""#
         );
     }
 

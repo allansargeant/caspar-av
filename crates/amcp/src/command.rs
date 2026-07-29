@@ -109,13 +109,42 @@ impl Command {
     }
 
     /// Serialise to the wire, including the trailing CRLF.
+    ///
+    /// The target's position is not where it looks like it should be. The
+    /// server's parser (`amcp_command_repository.cpp:165`) pops **one** token as
+    /// the command name, *then* parses the channel spec, and only then joins the
+    /// next token as a sub-command. So a two-word command aimed at a channel has
+    /// the target **between** its two words:
+    ///
+    /// ```text
+    /// MIXER 1-10 FILL 0 0 0.5 0.5      ✓ 202 MIXER OK
+    /// MIXER FILL 1-10 0 0 0.5 0.5      ✗ 400 ERROR
+    /// CG 1-20 ADD 1 lower-third 1      ✓
+    /// ```
+    ///
+    /// Global two-word commands (`DATA STORE`, `INFO CONFIG`, `CLEAR ALL`) have
+    /// no target and are unaffected. Verified against a live 2.5.0 server.
     pub fn to_wire(&self) -> String {
         let mut out = String::with_capacity(32 + self.name.len());
-        out.push_str(&self.name);
-        if let Some(t) = self.target.token() {
-            out.push(' ');
-            out.push_str(&t);
+
+        match (self.name.split_once(' '), self.target.token()) {
+            // Two words *and* a target: the target splits the name.
+            (Some((head, tail)), Some(target)) => {
+                out.push_str(head);
+                out.push(' ');
+                out.push_str(&target);
+                out.push(' ');
+                out.push_str(tail);
+            }
+            (_, target) => {
+                out.push_str(&self.name);
+                if let Some(t) = target {
+                    out.push(' ');
+                    out.push_str(&t);
+                }
+            }
         }
+
         for p in &self.params {
             out.push(' ');
             out.push_str(&escape(p));
@@ -205,11 +234,46 @@ mod tests {
     }
 
     #[test]
-    fn two_word_commands_keep_their_space() {
+    fn a_targeted_two_word_command_puts_the_target_in_the_middle() {
+        // The server's parser takes one token as the name, then the channel
+        // spec, then the sub-command. Verified against a live 2.5.0 server:
+        // the other order returns 400 ERROR.
         assert_eq!(
             Command::new("MIXER OPACITY").layer(1, 10).arg(0.5).to_wire(),
-            "MIXER OPACITY 1-10 0.5\r\n"
+            "MIXER 1-10 OPACITY 0.5\r\n"
         );
+        assert_eq!(
+            Command::new("MIXER FILL").layer(1, 10).args(["0", "0", "0.5", "0.5"]).to_wire(),
+            "MIXER 1-10 FILL 0 0 0.5 0.5\r\n"
+        );
+        assert_eq!(
+            Command::new("MIXER CLEAR").channel(2).to_wire(),
+            "MIXER 2 CLEAR\r\n"
+        );
+        assert_eq!(
+            Command::new("CG ADD").layer(1, 20).arg(1).arg("tpl").arg(1).to_wire(),
+            "CG 1-20 ADD 1 tpl 1\r\n"
+        );
+    }
+
+    #[test]
+    fn an_untargeted_two_word_command_keeps_its_words_together() {
+        assert_eq!(Command::new("CLEAR ALL").to_wire(), "CLEAR ALL\r\n");
+        assert_eq!(Command::new("INFO CONFIG").to_wire(), "INFO CONFIG\r\n");
+        assert_eq!(
+            Command::new("DATA STORE").arg("name").arg("payload").to_wire(),
+            "DATA STORE name payload\r\n"
+        );
+        assert_eq!(
+            Command::new("OSC SUBSCRIBE").arg(6250).to_wire(),
+            "OSC SUBSCRIBE 6250\r\n"
+        );
+    }
+
+    #[test]
+    fn a_one_word_command_puts_the_target_after_the_name() {
+        assert_eq!(Command::new("INFO").channel(1).to_wire(), "INFO 1\r\n");
+        assert_eq!(Command::new("PLAY").layer(1, 10).to_wire(), "PLAY 1-10\r\n");
     }
 
     #[test]

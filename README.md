@@ -2,10 +2,11 @@
 
 > **AI-assisted project.** This codebase was created with [Claude Code](https://claude.com/claude-code)
 > (Anthropic), directed and reviewed by a human author. The protocol work was
-> derived from the CasparCG 2.5.0 server source and verified end-to-end against a
-> built-in fake server (`scripts/fake-caspar.py`). It has **not yet** been run
-> against a real CasparCG server or in a live show. Validate playback, mapping
-> and cue behaviour on your own rig before relying on it.
+> derived from the CasparCG 2.5.0 source and then **verified against a real
+> CasparCG 2.5.0 server** (Ubuntu 24.04, headless, Mesa llvmpipe) — which caught
+> six genuine bugs, including a command-ordering mistake that broke every
+> `MIXER` and `CG` command. It has **not** been run on real output hardware or
+> in a live show. Validate on your own rig before relying on it.
 
 A **live-events media server built on CasparCG** — screens on a canvas, cues that
 change several of them on one frame, a media library, graphics templates and a
@@ -55,7 +56,7 @@ thing, and a browser that reconnects is immediately correct.
 
 ## Status
 
-Everything below is built and tested; **none of it has met real CasparCG yet.**
+Built, tested, and **verified against a real CasparCG 2.5.0 server**.
 
 - **`amcp`** — protocol codec and async client. Command building with the
   server's real escaping rules, response framing by status code, `REQ`/`RES`
@@ -69,6 +70,12 @@ Everything below is built and tested; **none of it has met real CasparCG yet.**
   serves the console. 12 tests.
 - **console** — six pages on a shared Resolve-style frame, ported from
   [OpenStage](https://github.com/allansargeant/openstage)'s console.
+
+**Verified against real CasparCG 2.5.0** — `scripts/protocol-probe.py` checks 22
+protocol claims with raw sockets (sharing no code with the crates, so it can
+disprove them), and `scripts/verify-mapping.py` has the server `PRINT` real
+frames to confirm `MIXER FILL` and `MIXER PERSPECTIVE` actually move pixels.
+See [docs/scope.md](docs/scope.md) for what that does and does not cover.
 
 **Not built:** timeline/timecode playback, auto-follow execution (cues carry a
 follow time; nothing fires it yet), soft-edge blending UI, MIDI/OSC control in,
@@ -89,6 +96,12 @@ No CasparCG to hand? Run the fake one — it speaks real AMCP framing, real
 
 ```bash
 python3 scripts/fake-caspar.py
+```
+
+Against a real server, check the protocol assumptions still hold:
+
+```bash
+python3 scripts/protocol-probe.py --host <your-caspar-host>
 ```
 
 ## The pages

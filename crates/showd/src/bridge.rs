@@ -220,7 +220,7 @@ impl Bridge {
     /// The raw OSC tree, for the diagnostics view. Everything the server has
     /// said, including keys this build does not model.
     pub fn telemetry_raw(&self) -> serde_json::Value {
-        self.inner.telemetry.lock().unwrap().raw().clone()
+        self.inner.telemetry.lock().unwrap().raw()
     }
 
     // -------------------------------------------------------------- commands

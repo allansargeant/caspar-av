@@ -223,5 +223,33 @@ async fn from_stream_drives_an_existing_socket() {
 
     let stream = TcpStream::connect(addr).await.unwrap();
     let client = Client::from_stream(stream);
-    assert_eq!(client.send(Command::new("PING")).await.unwrap().code, 202);
+    assert_eq!(client.send(Command::new("CLS")).await.unwrap().code, 202);
+}
+
+#[tokio::test]
+async fn ping_is_matched_despite_having_no_status_code() {
+    // The server answers PING with `PONG …` — no status code, no RES prefix,
+    // and the REQ id discarded. Without special handling the caller would wait
+    // out the full reply timeout on a command that did in fact succeed.
+    let (client, mut seen) = fake_server(|line, out| {
+        if line.starts_with("PING") {
+            out.push("PONG\r\n".to_string());
+        } else {
+            out.push(format!("RES {} 202 OK\r\n", req_id(line)));
+        }
+    })
+    .await;
+
+    let resp = tokio::time::timeout(Duration::from_secs(5), client.send(Command::new("PING")))
+        .await
+        .expect("PING must not hang")
+        .unwrap();
+    assert!(resp.is_ok());
+    assert_eq!(resp.status, "PONG");
+
+    // Sent bare — a REQ prefix would be discarded by the server anyway.
+    assert_eq!(seen.recv().await.unwrap(), "PING");
+
+    // The connection is still usable afterwards.
+    assert_eq!(client.send(Command::new("CLS")).await.unwrap().code, 202);
 }

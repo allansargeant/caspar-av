@@ -2,33 +2,57 @@
 
 The honest breakdown. The headline caveat governs everything below:
 
-> **caspar-AV has never been run against a real CasparCG server.** It was
-> developed and verified against `scripts/fake-caspar.py`, which implements the
-> protocol behaviours taken from the 2.5.0 source — real framing, real
-> `REQ`/`RES` correlation, real `BEGIN`/`COMMIT` semantics, real OSC bundles.
-> That validates the bridge's *logic*. It does not validate assumptions about
-> how a real server behaves under load, with real media, or with real hardware
-> outputs.
+> **caspar-AV has been verified against a real CasparCG 2.5.0 server** — Ubuntu
+> 24.04 amd64, headless, OpenGL 4.5 via Mesa llvmpipe, under emulation. That
+> covers the protocol, the telemetry and the output geometry, and it found six
+> real bugs that testing against a self-written fake never would have.
+>
+> It has **not** been run on real output hardware (DeckLink, NDI, a projector),
+> at broadcast resolutions, under sustained load, or in a live show. Emulated
+> software rendering says nothing about frame timing on a real rig.
+
+## What running it for real changed
+
+Verification against a live server found six bugs. Every one was in code that
+passed its own tests against a fake server written from the same reading of the
+source — which is exactly why the fake could not catch them:
+
+| Bug | Effect |
+|---|---|
+| `MIXER FILL 1-10 …` instead of `MIXER 1-10 FILL …` | **Every** `MIXER` and `CG` command returned `400`. The entire output-mapping and template model was inert. |
+| `400 ERROR` treated as carrying no data | The echoed command line was left in the buffer, risking mis-framing of the next response. |
+| `framerate` read as a float | It is a `,ii` rational; frame rate was always empty. |
+| fps read from `file/fps` | It lives at `file/streams/0/fps`, as a rational. `file/fps` is consumer-side. |
+| `file/frame`, `file/video/width` read | Never published for a producer; permanently empty. Frame numbers are now derived from `time × fps`. |
+| Telemetry keys never expired | A colour producer loaded over a clip kept reporting the finished clip's name and position. |
+
+Plus one dead field removed: `profiler/time` is never published, with or without
+a consumer.
 
 ## Built and verified
 
-**Protocol (`amcp`)** — 38 tests
+**Protocol (`amcp`)** — 44 tests
 
 - Command building with the server's real escaping rules, verified against
   `tokenize.cpp`: `\\`, `\"`, `\n`, quoting for spaces and parentheses.
-- Response decoding framed by status code, including split reads and bare LF.
+- Response decoding framed by status code, including the `400`-echoes-its-command
+  case, split reads and bare LF.
+- Two-word commands placing the target between their words, and `PING` — which
+  must be sent without a request id and answers with no status code.
 - `REQ`/`RES` correlation, with a test that forces out-of-order replies.
 - `BEGIN`/`COMMIT` batching: `BEGIN` unanswered, one reply per inner command,
   one `COMMIT` reply.
 - Connection loss wakes waiters instead of hanging to the timeout.
 - Typed builders for the full 2.5.0 command surface.
 
-**Telemetry (`casparosc`)** — 13 tests
+**Telemetry (`casparosc`)** — 20 tests
 
 - OSC 1.0 decoding: all types, nested bundles, blob padding, malformed packets
   rejected rather than panicking.
 - State tree with a typed digest; a leaf can become a branch as the server
-  changes what it reports.
+  changes what it reports, and keys that stop arriving expire.
+- Rational values (`framerate`, stream fps) decoded as num/den pairs.
+- A transcript test built from real captured telemetry, not invented data.
 - UDP listener that survives a bad datagram.
 
 **media-scanner (`scanner`)** — 5 tests
@@ -47,10 +71,18 @@ The honest breakdown. The headline caveat governs everything below:
 
 **Console** — six pages, type-checked and built
 
-Verified in a browser against the fake server: connection and reconnect, live
-telemetry rendering with position and frame time, screen creation, drag-to-map
-writing `MIXER FILL` through the API, transport commands, and the raw command
-line round-tripping a 200 multi-line response.
+Verified in a browser **against the real server**: connection and reconnect,
+live telemetry with position/duration/fps, screen creation, drag-to-map writing
+`MIXER FILL` through the API, transport commands, and the raw command line
+round-tripping a 200 multi-line response.
+
+**Protocol conformance** — `scripts/protocol-probe.py`, 22 checks, all passing
+against CasparCG 2.5.0. Raw sockets, no shared code with the crates.
+
+**Output geometry** — `scripts/verify-mapping.py`, driving a real server to
+`PRINT` real frames: five `MIXER FILL` placements land exactly on the requested
+cells, and `MIXER PERSPECTIVE` produces a genuine corner-pin wedge (left edge
+8/8 rows lit, right edge 2/8).
 
 ## Partial
 
@@ -88,3 +120,9 @@ line round-tripping a 200 multi-line response.
 - **`Health::Down` appears only after a connection attempt completes**, so there
   is a brief honest "connecting" window at startup.
 - **The command log holds 300 entries** in memory and is not persisted.
+- **The HTML/CEF producer was never exercised.** The test rig has no GPU, so
+  CEF's GPU process dies on start. Templates were verified as AMCP command
+  round-trips, not as rendered graphics.
+- **`scripts/verify-mapping.py` needs the test VM**, since it reads back PNGs
+  over `./ssh.sh`. It is kept as the record of how the geometry claim was
+  checked, not as a portable test.

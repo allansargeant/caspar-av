@@ -167,6 +167,13 @@ impl Client {
 
     /// Send a command and return its reply even when the status is an error.
     pub async fn send_raw(&self, command: Command) -> Result<Response, Error> {
+        // PING is answered `PONG …` with no status code and no RES prefix, so
+        // it can only be matched off the notification stream. Subscribing
+        // *before* sending is what stops the reply racing past the subscriber.
+        if command.name().eq_ignore_ascii_case("PING") {
+            return self.ping(command).await;
+        }
+
         let id = self.next_id();
         let (slot, wait) = oneshot::channel();
         let wire = format!("REQ {id} {}", command.to_wire());
@@ -236,6 +243,30 @@ impl Client {
                 lock(&self.pending).remove(&id);
                 Err(Error::Timeout("COMMIT".into()))
             }
+        }
+    }
+
+    /// `PING`, matched off the notification stream.
+    async fn ping(&self, command: Command) -> Result<Response, Error> {
+        let mut notes = self.notifications.subscribe();
+        // Sent without a REQ id: the server discards it for PING anyway.
+        self.tx
+            .send(Outgoing { wire: command.to_wire(), slot: None })
+            .map_err(|_| Error::Disconnected)?;
+
+        let wait = async {
+            loop {
+                match notes.recv().await {
+                    Ok(r) if r.status.starts_with("PONG") => return Ok(r),
+                    Ok(_) => continue,
+                    Err(_) => return Err(Error::Disconnected),
+                }
+            }
+        };
+
+        match tokio::time::timeout(REPLY_TIMEOUT, wait).await {
+            Ok(result) => result,
+            Err(_) => Err(Error::Timeout(command.to_string())),
         }
     }
 

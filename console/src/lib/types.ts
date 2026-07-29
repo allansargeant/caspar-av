@@ -12,9 +12,12 @@ export interface SlotState {
   name: string | null;
   time: number | null;
   duration: number | null;
+  /** Derived as time × fps — the server reports seconds, not frames. */
   frame: number | null;
   frames: number | null;
   fps: number | null;
+  clip_in: number | null;
+  clip_duration: number | null;
   loop: boolean;
   width: number | null;
   height: number | null;
@@ -30,7 +33,6 @@ export interface ChannelState {
   index: number;
   format: string | null;
   framerate: number | null;
-  profiler_time: number | null;
   layers: LayerState[];
 }
 

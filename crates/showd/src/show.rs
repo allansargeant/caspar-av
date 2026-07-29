@@ -450,7 +450,7 @@ mod tests {
     fn a_screen_maps_to_fill_and_opacity() {
         let s = show();
         let cmds = wire(&s.screen("left").unwrap().mapping_commands());
-        assert_eq!(cmds, vec!["MIXER FILL 1-10 0 0 0.5 1", "MIXER OPACITY 1-10 1"]);
+        assert_eq!(cmds, vec!["MIXER 1-10 FILL 0 0 0.5 1", "MIXER 1-10 OPACITY 1"]);
     }
 
     #[test]
@@ -459,7 +459,7 @@ mod tests {
         s.screens[0].corners = [(0.0, 0.02), (1.0, 0.0), (1.0, 1.0), (0.0, 0.98)];
         let cmds = wire(&s.screen("left").unwrap().mapping_commands());
         assert_eq!(cmds.len(), 3);
-        assert_eq!(cmds[1], "MIXER PERSPECTIVE 1-10 0 0.02 1 0 1 1 0 0.98");
+        assert_eq!(cmds[1], "MIXER 1-10 PERSPECTIVE 0 0.02 1 0 1 1 0 0.98");
     }
 
     #[test]
@@ -467,7 +467,7 @@ mod tests {
         let mut s = show();
         s.screens[0].enabled = false;
         let cmds = wire(&s.screen("left").unwrap().mapping_commands());
-        assert!(cmds.contains(&"MIXER OPACITY 1-10 0".to_string()));
+        assert!(cmds.contains(&"MIXER 1-10 OPACITY 0".to_string()));
     }
 
     #[test]
@@ -543,7 +543,7 @@ mod tests {
                 tween: Some("easeoutquad".into()),
             })
             .unwrap());
-        assert_eq!(cmds, vec!["MIXER OPACITY 1-10 0 50 easeoutquad"]);
+        assert_eq!(cmds, vec!["MIXER 1-10 OPACITY 0 50 easeoutquad"]);
     }
 
     #[test]

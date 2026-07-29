@@ -56,6 +56,10 @@ impl Response {
     }
 }
 
+/// The synthetic code given to a `PONG`, which arrives with no status code of
+/// its own. 200-range so [`Response::is_ok`] treats it as the success it is.
+pub const PONG_CODE: u16 = 200;
+
 /// How many data lines a code carries.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Framing {
@@ -66,7 +70,13 @@ enum Framing {
 
 fn framing_for(code: u16) -> Framing {
     match code {
-        101 | 201 => Framing::One,
+        // 400 echoes the offending command back on its own line
+        // (`AMCPProtocolStrategy.cpp:151`). Every other error code is a bare
+        // status line — 401/402/500/503 included. Verified against a live 2.5.0
+        // server: treating 400 as dataless leaves the echoed line in the buffer,
+        // where it is either dropped or, if it happens to begin with three
+        // digits, misread as the next response.
+        101 | 201 | 400 => Framing::One,
         200 => Framing::UntilBlank,
         _ => Framing::None,
     }
@@ -144,6 +154,13 @@ impl Decoder {
                 }
                 Framing::None => unreachable!("a Framing::None response is never left partial"),
             }
+        }
+
+        // `PING` is answered `PONG …` with no status code at all, and it
+        // ignores the REQ id (`AMCPProtocolStrategy.cpp:126`). Surfaced as a
+        // synthetic 200 so a console command line does not simply hang.
+        if line.starts_with("PONG") {
+            return Some(Response { id: None, code: PONG_CODE, status: line, lines: Vec::new() });
         }
 
         // A status line: an optional `RES <id> `, three digits, then the rest.
@@ -238,6 +255,37 @@ mod tests {
         assert_eq!(r.len(), 1);
         assert!(r[0].is_error());
         assert!(!r[0].is_ok());
+    }
+
+    #[test]
+    fn code_400_echoes_the_offending_command() {
+        // Exactly what a live 2.5.0 server sends for an unknown command. If 400
+        // were treated as dataless, the echoed line would be left in the buffer.
+        let r = decode("400 ERROR\r\nNOSUCHCOMMAND\r\n202 PLAY OK\r\n");
+        assert_eq!(r.len(), 2);
+        assert_eq!(r[0].code, 400);
+        assert_eq!(r[0].single(), Some("NOSUCHCOMMAND"));
+        assert_eq!(r[1].code, 202, "the next response must still be framed correctly");
+    }
+
+    #[test]
+    fn other_error_codes_carry_no_data() {
+        let r = decode("401 PLAY ERROR\r\n402 MIXER ERROR\r\n500 FAILED\r\n503 PLAY FAILED\r\n");
+        assert_eq!(r.len(), 4);
+        assert!(r.iter().all(|x| x.lines.is_empty()));
+        assert_eq!(r[3].code, 503);
+    }
+
+    #[test]
+    fn pong_is_surfaced_rather_than_dropped() {
+        // PING is answered with no status code and no RES prefix, so without
+        // this a caller would wait out the full reply timeout.
+        let r = decode("PONG hello\r\n");
+        assert_eq!(r.len(), 1);
+        assert_eq!(r[0].code, PONG_CODE);
+        assert_eq!(r[0].status, "PONG hello");
+        assert!(r[0].is_ok());
+        assert_eq!(r[0].id, None);
     }
 
     #[test]

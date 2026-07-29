@@ -77,11 +77,7 @@ export function ChannelsPage(props: PageProps) {
               <span className="channel-index">CH {ch.index}</span>
               <span className="small muted">{ch.format ?? "—"}</span>
               <span className="spacer" />
-              {ch.profiler_time != null && (
-                <span className="chip" title="Server frame time">
-                  {(ch.profiler_time * 1000).toFixed(1)} ms
-                </span>
-              )}
+              {ch.framerate != null && <span className="chip">{ch.framerate.toFixed(2)} fps</span>}
             </div>
             {ch.layers.length === 0 && <div className="list-empty small">No layers active</div>}
             {ch.layers.map((layer) => {

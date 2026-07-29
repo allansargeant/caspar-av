@@ -16,6 +16,23 @@ Matches the rest of this fleet, and the snapshot-mirror pattern was already
 proven against a live orchestrator in OpenStage. Reusing a shape that survived
 contact with a real rig beat designing a new one.
 
+## Verify against a real server, with code that shares nothing
+
+The crates were built from the 2.5.0 source, tested against a fake server
+written from *the same reading* of that source, and were entirely
+self-consistent — while every `MIXER` and `CG` command was silently malformed.
+A fake built from your own understanding can only confirm your understanding.
+
+So `scripts/protocol-probe.py` uses raw sockets and none of this project's code,
+and `scripts/verify-mapping.py` checks rendered pixels rather than status codes.
+Both are able to prove the crates wrong, which is the only property that
+mattered. Between them they found six bugs; see
+[scope.md](scope.md#what-running-it-for-real-changed).
+
+The probe's own expectations were wrong in the same way at first — it was written
+from the same mistaken reading. It still caught the bug, because it asserted on
+*observed bytes* rather than on what the code produced.
+
 ## Protocol facts from the source, not the wiki
 
 The community wiki lags 2.5.0 and is wrong or silent on things that break a
@@ -85,6 +102,27 @@ metadata and template schemas.
 plainly in the UI when the scanner is down — that specific confusion ("my media
 is missing") is the most common CasparCG support question there is.
 
+## Expire telemetry keys rather than accumulating them
+
+The server never retracts a key: when a producer changes, the keys that no
+longer apply simply stop being sent. A mirror that only inserts therefore
+reports a colour producer playing a clip that finished minutes ago — observed
+live, not hypothesised.
+
+Leaves are held flat, keyed by full OSC address, with the packet number they
+were last seen in; anything unseen for 50 packets is dropped. Flat because
+pruning a nested tree in place is far more code for the same result; counted in
+packets rather than seconds so it needs no clock and stays deterministic under
+test. The window is wide enough that a state split across several datagrams is
+never mistaken for a key disappearing.
+
+## Derive frame numbers rather than dropping them
+
+The server publishes position in *seconds*; `file/frame` does not exist on the
+producer side. Operators think in frames, and `time × fps` is exact when both
+figures come from the server, so the digest derives it — and says so, in the
+field's own documentation, rather than implying the server reported it.
+
 ## A hand-written OSC decoder
 
 `rosc` would have done, and OpenStage uses it. Written by hand here because the
@@ -118,4 +156,7 @@ resolved" puts a half-state on stage and hides the fault.
   to fan out — and then the frame-accuracy claim needs re-examining, since
   `COMMIT` only synchronises within one server.
 - **Show file versioning.** No schema version yet. Cheap now, expensive later.
+- **Consumers are visible in telemetry** (`output/port/<id>/…`) and audio levels
+  arrive as `mixer/audio/volume`. Neither is surfaced yet; both are free wins
+  discovered while verifying, not designed for.
 - **Control input.** No MIDI, OSC-in or Art-Net. The grid is keyboard and mouse.
