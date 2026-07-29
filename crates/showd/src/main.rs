@@ -22,7 +22,10 @@ use tower_http::trace::TraceLayer;
 use bridge::{Bridge, Config};
 use show::Show;
 
-#[derive(Parser, Debug)]
+/// `Serialize` so the effective configuration can be snapshotted into crash
+/// reports and diagnostics bundles — the first question about any fault is
+/// what the daemon was actually pointed at.
+#[derive(Parser, Debug, serde::Serialize)]
 #[command(name = "caspar-avd", version, about = "caspar-AV bridge daemon")]
 struct Args {
     /// CasparCG server host.
@@ -57,18 +60,34 @@ struct Args {
     /// Directory holding the built console.
     #[arg(long, default_value = "web")]
     web: PathBuf,
+
+    /// Write a diagnostics bundle and exit.
+    ///
+    /// Everything needed to investigate a fault in one file: build identity,
+    /// platform, configuration with secrets removed, recent logs and any
+    /// crash reports found.
+    #[arg(long)]
+    collect_diagnostics: bool,
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "info,tower_http=warn".into()),
-        )
-        .init();
-
     let args = Args::parse();
+
+    // Before anything that can fail, so a failure during startup is logged
+    // and lands in a crash report like any other.
+    let _diag = diag::init(
+        diag::Options::new("caspar-avd", "CASPAR_AV", env!("CARGO_PKG_VERSION"))
+            .with_default_filter("info,tower_http=warn")
+            .with_config(&args),
+    )
+    .context("starting logging")?;
+
+    if args.collect_diagnostics {
+        let path = diag::collect_diagnostics().context("collecting diagnostics")?;
+        println!("{}", path.display());
+        return Ok(());
+    }
 
     let show = match &args.show {
         Some(path) if path.exists() => {
