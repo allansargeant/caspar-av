@@ -173,6 +173,7 @@ Every screenshot here is a real render against
 | [amcp.md](docs/amcp.md) | The protocol, as the 2.5.0 source actually implements it — including where the wiki is wrong |
 | [architecture.md](docs/architecture.md) | Components, the snapshot contract, the show model and how cues compile |
 | [decisions.md](docs/decisions.md) | Every significant choice, why it won, and what is still open |
+| [diagnostics.md](docs/diagnostics.md) | Where the logs are, what a crash report contains, and how to send one file that explains a fault |
 | [scope.md](docs/scope.md) | Honestly what is built, what is partial, what is not started |
 | [releasing.md](docs/releasing.md) | How the six-platform release is built, locally |
 | [test-server.md](docs/test-server.md) | Running a real CasparCG to test against, on a Mac |
