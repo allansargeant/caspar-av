@@ -20,6 +20,12 @@ Not affiliated with or endorsed by the CasparCG project.
 > `MIXER FILL`; the corner-pin numbers write `MIXER PERSPECTIVE`. Every command
 > sent is in the log along the bottom.
 
+**Click around the console: <https://caspar-av.stoatworks-labs.com>** — the real
+console in your browser, and **firing a cue works**: the command log fills with
+the AMCP the bridge actually compiled for it. It replays a recording of
+`caspar-avd` running against `scripts/fake-caspar.py`, so nothing is driving a
+real server and nothing is saved. See [demo/README.md](demo/README.md).
+
 ## Why this exists
 
 [CasparCG Server](https://github.com/CasparCG/server) is a superb playout engine
