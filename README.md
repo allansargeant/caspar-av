@@ -33,6 +33,54 @@ real server and nothing is saved. See [demo/README.md](demo/README.md).
 correlation, `BEGIN`/`COMMIT` batching, OSC telemetry) that renders nothing, so no picture
 is coming out of anything.*
 
+<!-- downloads:start -->
+
+## Download
+
+**[v0.1.1](https://github.com/stoatworks-labs/caspar-av/releases/tag/v0.1.1)** — prebuilt for macOS, Windows and Linux. Pick your platform:
+
+<details>
+<summary><b>macOS</b> — Apple Silicon, Intel</summary>
+
+| Build | Download | Size |
+| --- | --- | --- |
+| Apple Silicon · .dmg disk image (CLI) | [`caspar-av-0.1.1-macos-aarch64-cli.dmg`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-aarch64-cli.dmg) | 4.3 MB |
+| Intel · .dmg disk image (CLI) | [`caspar-av-0.1.1-macos-x86_64-cli.dmg`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-x86_64-cli.dmg) | 4.4 MB |
+| Apple Silicon · .pkg installer (CLI) | [`caspar-av-0.1.1-macos-aarch64-cli.pkg`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-aarch64-cli.pkg) | 3.9 MB |
+| Intel · .pkg installer (CLI) | [`caspar-av-0.1.1-macos-x86_64-cli.pkg`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-x86_64-cli.pkg) | 3.9 MB |
+| Apple Silicon · .tar.gz archive | [`caspar-av-0.1.1-macos-aarch64.tar.gz`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-aarch64.tar.gz) | 3.9 MB |
+| Intel · .tar.gz archive | [`caspar-av-0.1.1-macos-x86_64.tar.gz`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-x86_64.tar.gz) | 3.9 MB |
+
+</details>
+
+<details>
+<summary><b>Windows</b> — x64, ARM64</summary>
+
+| Build | Download | Size |
+| --- | --- | --- |
+| x64 · .exe installer | [`caspar-av-0.1.1-windows-x86_64-setup.exe`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-windows-x86_64-setup.exe) | 3.0 MB |
+| ARM64 · .exe installer | [`caspar-av-0.1.1-windows-aarch64-setup.exe`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-windows-aarch64-setup.exe) | 2.8 MB |
+| x64 · .zip archive | [`caspar-av-0.1.1-windows-x86_64.zip`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-windows-x86_64.zip) | 3.6 MB |
+| ARM64 · .zip archive | [`caspar-av-0.1.1-windows-aarch64.zip`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-windows-aarch64.zip) | 3.5 MB |
+
+</details>
+
+<details>
+<summary><b>Linux</b> — x64, ARM64</summary>
+
+| Build | Download | Size |
+| --- | --- | --- |
+| x64 · .tar.gz archive | [`caspar-av-0.1.1-linux-x86_64.tar.gz`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-linux-x86_64.tar.gz) | 3.7 MB |
+| ARM64 · .tar.gz archive | [`caspar-av-0.1.1-linux-aarch64.tar.gz`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-linux-aarch64.tar.gz) | 3.6 MB |
+
+</details>
+
+All builds, checksums and release notes: [github.com/stoatworks-labs/caspar-av/releases](https://github.com/stoatworks-labs/caspar-av/releases).
+
+These builds are unsigned, so macOS and Windows each warn once on first launch — see [Unsigned builds — Gatekeeper, SmartScreen & Defender Firewall](#unsigned-builds--gatekeeper-smartscreen--defender-firewall) for the one-time fix.
+
+<!-- downloads:end -->
+
 ## Why this exists
 
 [CasparCG Server](https://github.com/CasparCG/server) is a superb playout engine
