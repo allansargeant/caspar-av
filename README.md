@@ -26,7 +26,7 @@ the AMCP the bridge actually compiled for it. It replays a recording of
 `caspar-avd` running against `scripts/fake-caspar.py`, so nothing is driving a
 real server and nothing is saved. See [demo/README.md](demo/README.md).
 
-[![Watch it running — 46 seconds](docs/video-thumb.png)](https://www.youtube.com/watch?v=HL9dq_a6H9Q)
+[![Watch it running — 46 seconds](docs/video-thumb.png)](https://www.youtube.com/watch?v=ZwxglkSSwfc)
 
 *A 46-second tour of the real console, driven through its own controls. It is talking to
 `scripts/fake-caspar.py` — a real protocol fixture (AMCP response framing, `REQ`/`RES`
