@@ -26,6 +26,13 @@ the AMCP the bridge actually compiled for it. It replays a recording of
 `caspar-avd` running against `scripts/fake-caspar.py`, so nothing is driving a
 real server and nothing is saved. See [demo/README.md](demo/README.md).
 
+[![Watch it running — 46 seconds](docs/video-thumb.png)](https://www.youtube.com/watch?v=HL9dq_a6H9Q)
+
+*A 46-second tour of the real console, driven through its own controls. It is talking to
+`scripts/fake-caspar.py` — a real protocol fixture (AMCP response framing, `REQ`/`RES`
+correlation, `BEGIN`/`COMMIT` batching, OSC telemetry) that renders nothing, so no picture
+is coming out of anything.*
+
 ## Why this exists
 
 [CasparCG Server](https://github.com/CasparCG/server) is a superb playout engine
@@ -202,6 +209,26 @@ dishonest.
   connection layer, all ported directly from its own console.
 - **[CasparCG](https://github.com/CasparCG/server)** — the engine that does all
   the actual work here.
+
+## Unsigned builds — Gatekeeper, SmartScreen & Defender Firewall
+
+The release binaries are **not code-signed or notarized** — that needs paid Apple
+and Microsoft developer certificates this project doesn't carry. The downloads are
+fine; the OS just can't identify the publisher, so it warns you the first time.
+
+- **macOS** — *"cannot be opened because the developer cannot be verified"*.
+  Right-click the app → **Open** → **Open**, or clear the flag:
+  `xattr -dr com.apple.quarantine "/Applications/caspar-AV.app"`
+- **Windows** — SmartScreen shows *"Windows protected your PC"* →
+  **More info** → **Run anyway**.
+- **Windows Defender Firewall** — first launch pops *"Allow caspar-AV to communicate on
+  these networks"*. Tick **Private** (and **Domain** on a managed network) — caspar-AV
+  needs it to serve the web console and reach your CasparCG server over AMCP and OSC.
+  Deny it and the console won't load and cues will never reach CasparCG.
+- **Linux** — no signing gate.
+
+Per-artifact steps, self-signing, checksum verification and the Defender Firewall reset
+procedure: **[docs/UNSIGNED.md](docs/UNSIGNED.md)**.
 
 ## Licence
 
