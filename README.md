@@ -278,6 +278,21 @@ fine; the OS just can't identify the publisher, so it warns you the first time.
 Per-artifact steps, self-signing, checksum verification and the Defender Firewall reset
 procedure: **[docs/UNSIGNED.md](docs/UNSIGNED.md)**.
 
+## Control it from Companion
+
+[**companion-module-caspar-av**](https://github.com/stoatworks-labs/companion-module-caspar-av) is a [Bitfocus Companion](https://bitfocus.io/companion) connection module for this app.
+
+Fires cues and pads, runs screen transport and mixer, invokes templates and
+sends raw AMCP — with per-screen presets generated from the show.
+
+It keeps three health signals separate rather than merging them: the module's
+link to caspar-avd, caspar-avd's link to CasparCG, and **whether OSC telemetry
+is arriving at all**. The third matters because commands can work perfectly
+while nothing knows what is on screen.
+
+It is not in the official Companion module store — install it via
+**Settings → Developer modules path**.
+
 ## Licence
 
 MIT — see [LICENSE](LICENSE). caspar-AV speaks to CasparCG over the wire and
