@@ -109,6 +109,13 @@ export function TopBar(props: { status: ConnStatus; snapshot: Snapshot; right?: 
         <span className="conn-dot" />
         {STATUS_LABEL[props.status]}
       </span>
+      {/* Opens the shared About dialog — see console/public/about.js, which
+          delegates this attribute from the document, so nothing is imported
+          here. The version it shows is this console's, not the daemon's: the
+          server's own version is already on the chip to the left. */}
+      <button type="button" className="topbar-about" data-stoatworks-about>
+        About
+      </button>
     </header>
   );
 }
