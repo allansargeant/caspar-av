@@ -46,8 +46,8 @@ is coming out of anything.*
 | --- | --- | --- |
 | Apple Silicon · .dmg disk image (CLI) | [`caspar-av-0.1.1-macos-aarch64-cli.dmg`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-aarch64-cli.dmg) | 4.3 MB |
 | Intel · .dmg disk image (CLI) | [`caspar-av-0.1.1-macos-x86_64-cli.dmg`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-x86_64-cli.dmg) | 4.4 MB |
-| Apple Silicon · .pkg installer (CLI) | [`caspar-av-0.1.1-macos-aarch64-cli.pkg`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-aarch64-cli.pkg) | 3.9 MB |
-| Intel · .pkg installer (CLI) | [`caspar-av-0.1.1-macos-x86_64-cli.pkg`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-x86_64-cli.pkg) | 3.9 MB |
+| Apple Silicon · .pkg installer (CLI) | [`caspar-av-0.1.1-macos-aarch64-cli.pkg`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-aarch64-cli.pkg) | 3.8 MB |
+| Intel · .pkg installer (CLI) | [`caspar-av-0.1.1-macos-x86_64-cli.pkg`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-x86_64-cli.pkg) | 4.0 MB |
 | Apple Silicon · .tar.gz archive | [`caspar-av-0.1.1-macos-aarch64.tar.gz`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-aarch64.tar.gz) | 3.9 MB |
 | Intel · .tar.gz archive | [`caspar-av-0.1.1-macos-x86_64.tar.gz`](https://github.com/stoatworks-labs/caspar-av/releases/download/v0.1.1/caspar-av-0.1.1-macos-x86_64.tar.gz) | 3.9 MB |
 
@@ -77,7 +77,7 @@ is coming out of anything.*
 
 All builds, checksums and release notes: [github.com/stoatworks-labs/caspar-av/releases](https://github.com/stoatworks-labs/caspar-av/releases).
 
-The Windows builds are unsigned, so SmartScreen warns once — see [Unsigned builds — Gatekeeper, SmartScreen & Defender Firewall](#unsigned-builds--gatekeeper-smartscreen--defender-firewall) for the one-time click-through.
+The Windows builds are unsigned, so SmartScreen warns once — see [Windows SmartScreen & Defender Firewall](#windows-smartscreen--defender-firewall) for the one-time click-through.
 
 <!-- downloads:end -->
 
