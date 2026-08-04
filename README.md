@@ -290,6 +290,10 @@ while nothing knows what is on screen.
 It is not in the official Companion module store — install it via
 **Settings → Developer modules path**.
 
+<!-- attributions:start -->
+This project is built on other people's work — see [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
+<!-- attributions:end -->
+
 ## Licence
 
 MIT — see [LICENSE](LICENSE). caspar-AV speaks to CasparCG over the wire and
