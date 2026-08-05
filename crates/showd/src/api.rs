@@ -116,7 +116,9 @@ async fn ui_socket(mut socket: WebSocket, bridge: Bridge) {
         if json == last {
             continue;
         }
-        if socket.send(Message::Text(json.clone())).await.is_err() {
+        // axum 0.8 changed Message::Text from String to Utf8Bytes; the conversion
+        // is the whole of that breaking change as far as this loop is concerned.
+        if socket.send(Message::Text(json.clone().into())).await.is_err() {
             return;
         }
         last = json;
