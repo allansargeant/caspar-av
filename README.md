@@ -77,7 +77,7 @@ is coming out of anything.*
 
 All builds, checksums and release notes: [github.com/stoatworks-labs/caspar-av/releases](https://github.com/stoatworks-labs/caspar-av/releases).
 
-The Windows builds are unsigned, so SmartScreen warns once — see [Windows SmartScreen & Defender Firewall](#windows-smartscreen--defender-firewall) for the one-time click-through.
+macOS builds are signed and notarised and open normally. The Windows builds are unsigned, so SmartScreen warns once — see [Windows SmartScreen & Defender Firewall](#windows-smartscreen--defender-firewall) for the one-time click-through.
 
 <!-- downloads:end -->
 
